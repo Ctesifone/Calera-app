@@ -17,7 +17,7 @@
       border-radius: 12px; padding: 14px; margin-bottom: 14px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
-    h2 { margin: 0 0 16px 0; font-size: 20px; }
+    h2 { margin: 0 0 20px 0; font-size: 20px; }
     .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     button {
       border: none; border-radius: 10px; padding: 14px; font-size: 14px;
@@ -45,7 +45,7 @@
 <body>
 
   <div class="card">
-    <h2>🎛 Mode de Control (De Dietrich)</h2>
+    <h2>🎛 Mode de Control (De Dietrich) 🎛</h2>
     <div class="modes">
       <button class="secondary" onclick="sendMode('MANUAL')">✋ MANUAL ✋</button>
       <button onclick="sendMode('SCHEDULE')">🗓 PROGRAMAT</button>
@@ -56,7 +56,7 @@
   </div>
 
   <div class="card">
-    <h2>🗓 Programació Setmanal</h2>
+    <h2>🗓 Programació Setmanal 🗓</h2>
     <div id="week-list"></div>
     <button class="save" onclick="saveWeek()">💾 Enviar horaris al NanoC6</button>
   </div>
