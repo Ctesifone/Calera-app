@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caldera De Dietrich</title>
+  <script src="https://telegram.org"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--tg-theme-bg-color, #f4f4f5);
+      color: var(--tg-theme-text-color, #18181b);
+      margin: 0; padding: 16px;
+    }
+    .card {
+      background: var(--tg-theme-secondary-bg-color, #ffffff);
+      border-radius: 12px; padding: 14px; margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    h2 { margin: 0 0 10px 0; font-size: 16px; }
+    .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    button {
+      border: none; border-radius: 10px; padding: 14px; font-size: 14px;
+      font-weight: 600; cursor: pointer;
+      background: var(--tg-theme-button-color, #2563eb);
+      color: var(--tg-theme-button-text-color, #ffffff);
+    }
+    button.secondary {
+      background: var(--tg-theme-bg-color, #e4e4e7);
+      color: var(--tg-theme-text-color, #18181b);
+    }
+    button.danger { background: #dc2626; color: #fff; width: 100%; margin-top: 10px; }
+    button.save { background: #16a34a; color: #fff; width: 100%; margin-top: 12px; font-size: 15px; }
+    .day-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0; border-bottom: 1px solid rgba(128,128,128,0.15);
+    }
+    .day-row:last-child { border-bottom: none; }
+    input[type="time"] {
+      border: 1px solid rgba(128,128,128,0.3); border-radius: 6px;
+      padding: 4px; font-size: 14px; background: transparent; color: inherit;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>🎛 Mode de Control (De Dietrich)</h2>
+    <div class="modes">
+      <button class="secondary" onclick="sendMode('MANUAL')">✋ MANUAL</button>
+      <button onclick="sendMode('SCHEDULE')">🗓 PROGRAMAT</button>
+      <button class="secondary" onclick="sendMode('SUMMER')">☀️ ESTIU</button>
+      <button class="secondary" onclick="sendMode('WINTER')">🔥 HIVERN</button>
+    </div>
+    <button class="danger" onclick="sendCmd('STOP_NEXT')">⏹ Aturar fins proper inici</button>
+  </div>
+
+  <div class="card">
+    <h2>🗓 Programació Setmanal</h2>
+    <div id="week-list"></div>
+    <button class="save" onclick="saveWeek()">💾 Enviar horaris al NanoC6</button>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const DAYS = ["Dilluns", "Dimarts", "Dimecres", "Dijous", "Divendres", "Dissabte", "Diumenge"];
+    // Horari per defecte (es desa a la memòria del teu navegador del mòbil)
+    let schedule = JSON.parse(localStorage.getItem("caldera_week")) || 
+      DAYS.map((_, i) => ({ en: true, s: 360, e: (i === 1 || i === 3) ? 420 : 510 }));
+
+    function minToTime(m) {
+      if (m >= 1440) return "00:00";
+      const hh = String(Math.floor(m / 60)).padStart(2, "0");
+      const mm = String(m % 60).padStart(2, "0");
+      return `${hh}:${mm}`;
+    }
+
+    function timeToMin(str, isStop) {
+      const [hh, mm] = str.split(":").map(Number);
+      const val = hh * 60 + mm;
+      return (isStop && val === 0) ? 1440 : val;
+    }
+
+    function renderWeek() {
+      const container = document.getElementById("week-list");
+      container.innerHTML = schedule.map((d, i) => `
+        <div class="day-row">
+          <label><input type="checkbox" ${d.en ? "checked" : ""} onchange="schedule[${i}].en=this.checked"> ${DAYS[i]}</label>
+          <div>
+            <input type="time" value="${minToTime(d.s)}" onchange="schedule[${i}].s=timeToMin(this.value, false)">
+            –
+            <input type="time" value="${minToTime(d.e)}" onchange="schedule[${i}].e=timeToMin(this.value, true)">
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function sendMode(mode) {
+      tg.sendData(JSON.stringify({ cmd: "SET_MODE", mode }));
+    }
+
+    function sendCmd(cmd) {
+      tg.sendData(JSON.stringify({ cmd }));
+    }
+
+    function saveWeek() {
+      localStorage.setItem("caldera_week", JSON.stringify(schedule));
+      tg.sendData(JSON.stringify({ cmd: "SAVE_WEEK", days: schedule }));
+    }
+
+    renderWeek();
+  </script>
+</body>
+</html>
