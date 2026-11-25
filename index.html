@@ -18,8 +18,8 @@
   --card:#ffffff;
   --ink:#203342;
   --muted:#71818d;
-  --accent:#237b83;
-  --accent-soft:#e4f2f1;
+  --accent:#57358f;
+  --accent-soft:#eee9f7;
   --line:#e8edf0;
   --green:#27865e;
   --red:#c34d4d;
@@ -91,7 +91,66 @@ h1 { font-size:21px; margin:0; letter-spacing:-.5px; }
 .info-label {
   font-size:11px;color:var(--muted);margin-bottom:5px;
 }
-.info-value { font-size:13px;font-weight:650;overflow-wrap:anywhere; }
+.info-value {
+  font-size:13px;font-weight:650;overflow-wrap:anywhere;
+}
+.mode-options {
+  display:grid;
+  gap:10px;
+  margin-top:16px;
+}
+.mode-option {
+  width:100%;
+  text-align:left;
+  padding:13px 14px;
+  border:1.5px solid var(--line);
+  border-radius:13px;
+  background:#fff;
+  color:var(--ink);
+  cursor:pointer;
+  transition:border-color .15s,background .15s;
+}
+.mode-option:hover {
+  border-color:#b8a6d5;
+}
+.mode-option.selected {
+  border-color:var(--accent);
+  background:var(--accent-soft);
+}
+.mode-option-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  font-size:14px;
+  font-weight:750;
+}
+.mode-option-description {
+  display:block;
+  font-size:12px;
+  font-weight:400;
+  color:var(--muted);
+  line-height:1.45;
+  margin-top:5px;
+}
+.mode-tag {
+  font-size:10px;
+  font-weight:700;
+  color:var(--accent);
+  background:#fff;
+  border-radius:20px;
+  padding:4px 7px;
+  white-space:nowrap;
+}
+.mode-notice {
+  background:#f3f7f8;
+  border-radius:12px;
+  padding:12px;
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.5;
+  margin-top:14px;
+}
 .day {
   display:grid;
   grid-template-columns:100px 1fr auto;
@@ -109,7 +168,9 @@ h1 { font-size:21px; margin:0; letter-spacing:-.5px; }
   padding:5px 8px;border-radius:20px;
   background:var(--accent-soft);color:var(--accent);
 }
-.day-state.disabled { background:#f0f1f2;color:#87939b; }
+.day-state.disabled {
+  background:#f0f1f2;color:#87939b;
+}
 .notice {
   background:#f3f7f8;border-radius:12px;
   padding:12px;font-size:12px;color:var(--muted);
@@ -129,9 +190,13 @@ input {
   border-radius:10px;font-size:16px;margin-top:6px;
   background:#fff;color:var(--ink);
 }
-label { display:block;font-size:13px;font-weight:600;margin-top:14px; }
+label {
+  display:block;font-size:13px;font-weight:600;margin-top:14px;
+}
 #login button { width:100%;margin-top:20px; }
-#message { font-size:13px;line-height:1.5;margin-top:13px;color:var(--red); }
+#message {
+  font-size:13px;line-height:1.5;margin-top:13px;color:var(--red);
+}
 .hidden { display:none!important; }
 footer {
   text-align:center;color:#91a0a9;font-size:11px;
@@ -195,9 +260,10 @@ footer {
     <h2 class="card-title">
       <span class="icon">♨</span> Funcionament
     </h2>
+
     <div class="muted">Mode actual registrat</div>
     <div id="mode" class="mode">—</div>
-    <div id="modeDescription" class="muted">Esperant dades...</div>
+
     <div class="info-grid">
       <div class="info">
         <div class="info-label">Parada temporal</div>
@@ -207,6 +273,59 @@ footer {
         <div class="info-label">Sessió</div>
         <div id="userName" class="info-value">—</div>
       </div>
+    </div>
+
+    <div style="margin-top:20px;font-size:14px;font-weight:700">
+      Selecciona el mode de funcionament
+    </div>
+
+    <div class="mode-options" id="modeOptions">
+      <button type="button" class="mode-option" data-mode="MANUAL">
+        <span class="mode-option-top">
+          <span>Manual</span>
+          <span class="mode-tag hidden">Mode actual</span>
+        </span>
+        <span class="mode-option-description">
+          La calefacció es governa amb l'interruptor de la caldera.
+        </span>
+      </button>
+
+      <button type="button" class="mode-option" data-mode="PROGRAMAT">
+        <span class="mode-option-top">
+          <span>Programat</span>
+          <span class="mode-tag hidden">Mode actual</span>
+        </span>
+        <span class="mode-option-description">
+          Segueix els horaris setmanals configurats.
+        </span>
+      </button>
+
+      <button type="button" class="mode-option" data-mode="ESTIU">
+        <span class="mode-option-top">
+          <span>Estiu</span>
+          <span class="mode-tag hidden">Mode actual</span>
+        </span>
+        <span class="mode-option-description">
+          Manté seleccionat el funcionament en mode d'estiu,
+          independentment dels horaris.
+        </span>
+      </button>
+
+      <button type="button" class="mode-option" data-mode="HIVERN">
+        <span class="mode-option-top">
+          <span>Hivern</span>
+          <span class="mode-tag hidden">Mode actual</span>
+        </span>
+        <span class="mode-option-description">
+          Manté seleccionat el funcionament en mode d'hivern,
+          independentment dels horaris.
+        </span>
+      </button>
+    </div>
+
+    <div id="modeNotice" class="mode-notice">
+      Pots consultar i provar la selecció dels modes.
+      En aquesta fase, les seleccions no s'envien a la caldera.
     </div>
   </div>
 
@@ -250,6 +369,8 @@ if (tg) {
 
 const $ = id => document.getElementById(id);
 let refreshTimer = null;
+let actualMode = "MANUAL";
+let previewMode = null;
 
 function showLogin(message = "") {
   $("login").classList.remove("hidden");
@@ -313,35 +434,62 @@ function modeName(value) {
   return names[value] || value || "Desconegut";
 }
 
-function modeDescriptionText(value) {
-  const descriptions = {
-    MANUAL: "La calefacció es governa amb l'interruptor de la caldera.",
-    PROGRAMAT: "Segueix els horaris setmanals configurats.",
-    SCHEDULE: "Segueix els horaris setmanals configurats.",
-    ESTIU: "Manté seleccionat el funcionament en mode d'estiu, independentment dels horaris.",
-    SUMMER: "Manté seleccionat el funcionament en mode d'estiu, independentment dels horaris.",
-    "ESTIU REMOT": "Manté seleccionat el funcionament en mode d'estiu, independentment dels horaris.",
-    HIVERN: "Manté seleccionat el funcionament en mode d'hivern, independentment dels horaris.",
-    WINTER: "Manté seleccionat el funcionament en mode d'hivern, independentment dels horaris.",
-    "HIVERN REMOT": "Manté seleccionat el funcionament en mode d'hivern, independentment dels horaris."
+function normalizedMode(value) {
+  const aliases = {
+    SCHEDULE:"PROGRAMAT",
+    SUMMER:"ESTIU",
+    "ESTIU REMOT":"ESTIU",
+    WINTER:"HIVERN",
+    "HIVERN REMOT":"HIVERN"
   };
-  return descriptions[value] || "Funcionament del mode seleccionat.";
+  return aliases[value] || value || "MANUAL";
+}
+
+function renderModeOptions() {
+  document.querySelectorAll(".mode-option").forEach(button => {
+    const mode = button.dataset.mode;
+    const isActual = mode === actualMode;
+    const isPreview = previewMode
+      ? mode === previewMode
+      : isActual;
+
+    button.classList.toggle("selected", isPreview);
+
+    const tag = button.querySelector(".mode-tag");
+    tag.classList.toggle("hidden", !isActual);
+
+    button.setAttribute("aria-pressed", String(isPreview));
+  });
+
+  if (previewMode && previewMode !== actualMode) {
+    $("modeNotice").textContent =
+      "Selecció de prova: " + modeName(previewMode) +
+      ". Aquesta selecció només és visual i encara no s'ha enviat a la caldera.";
+  } else {
+    $("modeNotice").textContent =
+      "El mode actual és " + modeName(actualMode) +
+      ". Pots provar altres seleccions, però encara no s'envien ordres a la caldera.";
+  }
 }
 
 function renderState(state) {
   const online = Number(state.device_online) === 1 ||
                  state.device_online === true;
+
   $("connectionDot").className =
     "dot " + (online ? "online" : "offline");
+
   $("connectionText").textContent =
     online ? "Dispositiu connectat" : "Dispositiu desconnectat";
 
   $("lastSeen").textContent = dateTime(state.last_seen);
   $("updatedAt").textContent = dateTime(state.updated_at);
 
+  actualMode = normalizedMode(state.control_mode);
+  previewMode = null;
+
   $("mode").textContent = modeName(state.control_mode);
-  $("modeDescription").textContent =
-    modeDescriptionText(state.control_mode);
+  renderModeOptions();
 
   const until = Number(state.stop_override_until || 0);
   if (until > Math.floor(Date.now()/1000)) {
@@ -353,10 +501,12 @@ function renderState(state) {
 
 function renderSchedule(rows) {
   const ordered = [...rows].sort((a,b) => Number(a.day)-Number(b.day));
+
   $("weekList").innerHTML = ordered.map(day => {
     const enabled = Number(day.enabled) === 1;
     const hours = minutesToTime(day.start_minute) + " – " +
                   minutesToTime(day.stop_minute);
+
     return `
       <div class="day">
         <span class="day-name">${DAYS[Number(day.day)] || "—"}</span>
@@ -370,6 +520,7 @@ function renderSchedule(rows) {
 
 async function loadState() {
   $("refreshText").textContent = "Actualitzant dades...";
+
   try {
     const data = await api("/api/state");
     renderState(data.state);
@@ -386,6 +537,7 @@ async function loadState() {
       showLogin("La sessió ha caducat. Torna a iniciar-la.");
       return;
     }
+
     $("dashboardMessage").textContent =
       "No s'han pogut actualitzar les dades: " + error.message;
     $("refreshText").textContent = "No s'ha pogut actualitzar";
@@ -403,11 +555,20 @@ function stopRefresh() {
   refreshTimer = null;
 }
 
+document.querySelectorAll(".mode-option").forEach(button => {
+  button.addEventListener("click", () => {
+    previewMode = button.dataset.mode;
+    renderModeOptions();
+  });
+});
+
 $("loginForm").addEventListener("submit", async event => {
   event.preventDefault();
+
   const button = $("loginButton");
   button.disabled = true;
   $("message").textContent = "Validant credencials...";
+
   try {
     const response = await fetch(API + "/api/login", {
       method:"POST",
@@ -417,16 +578,20 @@ $("loginForm").addEventListener("submit", async event => {
         password:$("password").value
       })
     });
+
     const data = await response.json();
+
     if (!response.ok || !data.ok) {
       throw new Error(data.error || "Credencials incorrectes");
     }
 
     sessionStorage.setItem("caldera_token", data.token);
     $("password").value = "";
+
     await api("/api/me");
     showDashboard();
     startRefresh();
+
   } catch (error) {
     $("message").textContent = error.message;
   } finally {
@@ -439,6 +604,7 @@ $("refreshButton").addEventListener("click", loadState);
 $("logoutButton").addEventListener("click", async () => {
   const currentToken = token();
   stopRefresh();
+
   try {
     if (currentToken) {
       await fetch(API + "/api/logout", {
@@ -447,12 +613,14 @@ $("logoutButton").addEventListener("click", async () => {
       });
     }
   } catch {}
+
   sessionStorage.removeItem("caldera_token");
   showLogin("Sessió tancada correctament.");
 });
 
 async function init() {
   if (!token()) return;
+
   try {
     const data = await api("/api/me");
     $("userName").textContent = data.username;
