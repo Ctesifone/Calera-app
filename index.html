@@ -1,116 +1,455 @@
+
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Control remot de la caldera De Dietrich</title>
-  <script src="https://telegram.org"></script>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--tg-theme-bg-color, #f4f4f5);
-      color: var(--tg-theme-text-color, #18181b);
-      margin: 0; padding: 16px;
-    }
-    .card {
-      background: var(--tg-theme-secondary-bg-color, #ffffff);
-      border-radius: 12px; padding: 14px; margin-bottom: 14px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    h2 { margin: 0 0 20px 0; font-size: 20px; }
-    .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    button {
-      border: none; border-radius: 10px; padding: 14px; font-size: 14px;
-      font-weight: 600; cursor: pointer;
-      background: var(--tg-theme-button-color, #2563eb);
-      color: var(--tg-theme-button-text-color, #ffffff);
-    }
-    button.secondary {
-      background: var(--tg-theme-bg-color, #e4e4e7);
-      color: var(--tg-theme-text-color, #18181b);
-    }
-    button.danger { background: #dc2626; color: #fff; width: 100%; margin-top: 10px; }
-    button.save { background: #16a34a; color: #fff; width: 100%; margin-top: 12px; font-size: 15px; }
-    .day-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 0; border-bottom: 1px solid rgba(128,128,128,0.15);
-    }
-    .day-row:last-child { border-bottom: none; }
-    input[type="time"] {
-      border: 1px solid rgba(128,128,128,0.3); border-radius: 6px;
-      padding: 4px; font-size: 14px; background: transparent; color: inherit;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#172c3b">
+<title>Caldera · Control remot</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+  --bg:#edf2f5;
+  --card:#ffffff;
+  --ink:#203342;
+  --muted:#71818d;
+  --accent:#237b83;
+  --accent-soft:#e4f2f1;
+  --line:#e8edf0;
+  --green:#27865e;
+  --red:#c34d4d;
+  --shadow:0 5px 22px rgba(27,49,65,.07);
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  padding:22px 16px 40px;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+main { max-width:560px; margin:auto; }
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:22px;
+}
+.brand { display:flex; align-items:center; gap:12px; }
+.logo {
+  width:45px;height:45px;border-radius:14px;
+  display:grid;place-items:center;
+  background:#203b4c;color:white;font-size:23px;
+}
+h1 { font-size:21px; margin:0; letter-spacing:-.5px; }
+.subtitle { color:var(--muted);font-size:12px;margin-top:3px; }
+.card {
+  background:var(--card);
+  border-radius:18px;
+  padding:19px;
+  margin-bottom:15px;
+  box-shadow:var(--shadow);
+}
+.card-title {
+  font-size:14px;font-weight:700;
+  margin:0 0 15px;
+  display:flex;align-items:center;gap:9px;
+}
+.icon {
+  width:31px;height:31px;border-radius:10px;
+  display:grid;place-items:center;
+  background:var(--accent-soft);font-size:16px;
+}
+.status-line {
+  display:flex;align-items:center;gap:9px;
+  font-size:14px;font-weight:650;
+}
+.dot {
+  width:10px;height:10px;border-radius:50%;
+  background:#aab4bb;display:inline-block;
+}
+.dot.online { background:var(--green); }
+.dot.offline { background:var(--red); }
+.mode {
+  font-size:23px;font-weight:750;
+  letter-spacing:-.6px;margin:7px 0 4px;
+}
+.muted { color:var(--muted);font-size:12px; }
+.info-grid {
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:10px;margin-top:16px;
+}
+.info {
+  background:#f5f8f9;border-radius:12px;padding:12px;
+  min-width:0;
+}
+.info-label {
+  font-size:11px;color:var(--muted);margin-bottom:5px;
+}
+.info-value { font-size:13px;font-weight:650;overflow-wrap:anywhere; }
+.day {
+  display:grid;
+  grid-template-columns:100px 1fr auto;
+  align-items:center;
+  gap:8px;
+  padding:11px 0;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+}
+.day:last-child { border-bottom:0;padding-bottom:0; }
+.day-name { font-weight:650; }
+.hours { color:var(--muted);font-variant-numeric:tabular-nums; }
+.day-state {
+  font-size:10px;font-weight:700;
+  padding:5px 8px;border-radius:20px;
+  background:var(--accent-soft);color:var(--accent);
+}
+.day-state.disabled { background:#f0f1f2;color:#87939b; }
+.notice {
+  background:#f3f7f8;border-radius:12px;
+  padding:12px;font-size:12px;color:var(--muted);
+  line-height:1.5;margin-top:13px;
+}
+button {
+  border:0;border-radius:11px;padding:13px 16px;
+  background:var(--accent);color:white;
+  font-weight:650;font-size:14px;cursor:pointer;
+}
+button:disabled { opacity:.6;cursor:wait; }
+.secondary {
+  background:#e9eff1;color:var(--ink);
+}
+input {
+  width:100%;padding:13px;border:1px solid #dce4e8;
+  border-radius:10px;font-size:16px;margin-top:6px;
+  background:#fff;color:var(--ink);
+}
+label { display:block;font-size:13px;font-weight:600;margin-top:14px; }
+#login button { width:100%;margin-top:20px; }
+#message { font-size:13px;line-height:1.5;margin-top:13px;color:var(--red); }
+.hidden { display:none!important; }
+footer {
+  text-align:center;color:#91a0a9;font-size:11px;
+  padding:10px;
+}
+@media(max-width:390px) {
+  .day { grid-template-columns:83px 1fr auto;gap:5px;font-size:12px; }
+  .card { padding:16px; }
+}
+</style>
 </head>
 <body>
-
-  <div class="card">
-    <h2>🎛 Mode de Control (De Dietrich) 🎛</h2>
-    <div class="modes">
-      <button class="secondary" onclick="sendMode('MANUAL')">✋ MANUAL ✋</button>
-      <button onclick="sendMode('SCHEDULE')">🗓 PROGRAMAT</button>
-      <button class="secondary" onclick="sendMode('SUMMER')">☀️ ESTIU ☀️</button>
-      <button class="secondary" onclick="sendMode('WINTER')">🔥 HIVERN 🔥</button>
+<main>
+<header>
+  <div class="brand">
+    <div class="logo">♨</div>
+    <div>
+      <h1>Caldera</h1>
+      <div class="subtitle">Control remot de la calefacció</div>
     </div>
-    <button class="danger" onclick="sendCmd('STOP_NEXT')">⏹ Aturar fins proper inici</button>
+  </div>
+</header>
+
+<section id="login" class="card">
+  <h2 class="card-title">🔐 Inici de sessió</h2>
+  <form id="loginForm">
+    <label>Nom d'usuari
+      <input id="username" autocomplete="username" required maxlength="32">
+    </label>
+    <label>Contrasenya
+      <input id="password" type="password"
+        autocomplete="current-password" required maxlength="128">
+    </label>
+    <button id="loginButton" type="submit">Entrar</button>
+  </form>
+  <div id="message"></div>
+</section>
+
+<section id="dashboard" class="hidden">
+  <div class="card">
+    <h2 class="card-title">
+      <span class="icon">📡</span> Connexió del dispositiu
+    </h2>
+    <div class="status-line">
+      <span id="connectionDot" class="dot"></span>
+      <span id="connectionText">Comprovant connexió...</span>
+    </div>
+    <div class="info-grid">
+      <div class="info">
+        <div class="info-label">Última comunicació</div>
+        <div id="lastSeen" class="info-value">—</div>
+      </div>
+      <div class="info">
+        <div class="info-label">Dades actualitzades</div>
+        <div id="updatedAt" class="info-value">—</div>
+      </div>
+    </div>
   </div>
 
   <div class="card">
-    <h2>🗓 Programació Setmanal 🗓</h2>
-    <div id="week-list"></div>
-    <button class="save" onclick="saveWeek()">💾 Enviar horaris al NanoC6</button>
+    <h2 class="card-title">
+      <span class="icon">♨</span> Funcionament
+    </h2>
+    <div class="muted">Mode actual registrat</div>
+    <div id="mode" class="mode">—</div>
+    <div id="modeDescription" class="muted">Esperant dades...</div>
+    <div class="info-grid">
+      <div class="info">
+        <div class="info-label">Parada temporal</div>
+        <div id="stopStatus" class="info-value">—</div>
+      </div>
+      <div class="info">
+        <div class="info-label">Sessió</div>
+        <div id="userName" class="info-value">—</div>
+      </div>
+    </div>
   </div>
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+  <div class="card">
+    <h2 class="card-title">
+      <span class="icon">🗓</span> Programació setmanal
+    </h2>
+    <div id="weekList"></div>
+    <div class="notice">
+      Aquests horaris són els que consten actualment a la base de dades.
+      En aquesta fase només es poden consultar; encara no es poden modificar.
+    </div>
+  </div>
 
-    const DAYS = ["Dilluns", "Dimarts", "Dimecres", "Dijous", "Divendres", "Dissabte", "Diumenge"];
-    // Horari per defecte (es desa a la memòria del teu navegador del mòbil)
-    let schedule = JSON.parse(localStorage.getItem("caldera_week")) || 
-      DAYS.map((_, i) => ({ en: true, s: 360, e: (i === 1 || i === 3) ? 420 : 510 }));
+  <div class="card">
+    <div class="status-line">
+      <span class="dot online"></span>
+      <span id="refreshText">Consulta automàtica cada 30 segons</span>
+    </div>
+    <button id="refreshButton" class="secondary"
+      style="width:100%;margin-top:14px">↻ Actualitzar dades</button>
+    <button id="logoutButton" class="secondary"
+      style="width:100%;margin-top:9px">Tancar sessió</button>
+    <div id="dashboardMessage" class="muted" style="margin-top:12px"></div>
+  </div>
+</section>
 
-    function minToTime(m) {
-      if (m >= 1440) return "00:00";
-      const hh = String(Math.floor(m / 60)).padStart(2, "0");
-      const mm = String(m % 60).padStart(2, "0");
-      return `${hh}:${mm}`;
+<footer>Caldera · Control privat</footer>
+</main>
+
+<script>
+const API = "https://caldera-control.ctesifone.workers.dev";
+const DAYS = ["Dilluns","Dimarts","Dimecres","Dijous",
+              "Divendres","Dissabte","Diumenge"];
+
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
+
+const $ = id => document.getElementById(id);
+let refreshTimer = null;
+
+function showLogin(message = "") {
+  $("login").classList.remove("hidden");
+  $("dashboard").classList.add("hidden");
+  $("message").textContent = message;
+}
+
+function showDashboard() {
+  $("login").classList.add("hidden");
+  $("dashboard").classList.remove("hidden");
+}
+
+function token() {
+  return sessionStorage.getItem("caldera_token");
+}
+
+async function api(path, options = {}) {
+  const response = await fetch(API + path, {
+    ...options,
+    headers: {
+      ...(options.headers || {}),
+      ...(token() ? { "Authorization": "Bearer " + token() } : {})
+    }
+  });
+
+  const data = await response.json();
+  if (!response.ok || !data.ok) {
+    throw new Error(data.error || "Error de comunicació");
+  }
+  return data;
+}
+
+function dateTime(epoch) {
+  if (!epoch || Number(epoch) <= 0) return "—";
+  return new Date(Number(epoch) * 1000).toLocaleString("ca-ES", {
+    dateStyle:"short", timeStyle:"short"
+  });
+}
+
+function minutesToTime(value) {
+  const n = Number(value);
+  if (n === 1440) return "24:00";
+  const h = Math.floor(n / 60);
+  const m = n % 60;
+  return String(h).padStart(2,"0") + ":" +
+         String(m).padStart(2,"0");
+}
+
+function modeName(value) {
+  const names = {
+    MANUAL:"Manual",
+    PROGRAMAT:"Programat",
+    SCHEDULE:"Programat",
+    ESTIU:"Estiu",
+    SUMMER:"Estiu",
+    "ESTIU REMOT":"Estiu",
+    HIVERN:"Hivern",
+    WINTER:"Hivern",
+    "HIVERN REMOT":"Hivern"
+  };
+  return names[value] || value || "Desconegut";
+}
+
+function renderState(state) {
+  const online = Number(state.device_online) === 1 ||
+                 state.device_online === true;
+
+  $("connectionDot").className =
+    "dot " + (online ? "online" : "offline");
+  $("connectionText").textContent =
+    online ? "Dispositiu connectat" : "Dispositiu desconnectat";
+
+  $("lastSeen").textContent = dateTime(state.last_seen);
+  $("updatedAt").textContent = dateTime(state.updated_at);
+
+  $("mode").textContent = modeName(state.control_mode);
+  $("modeDescription").textContent =
+    "Mode informat per la base de dades";
+
+  const until = Number(state.stop_override_until || 0);
+  if (until > Math.floor(Date.now()/1000)) {
+    $("stopStatus").textContent = "Activa fins " + dateTime(until);
+  } else {
+    $("stopStatus").textContent = "No consta cap parada activa";
+  }
+}
+
+function renderSchedule(rows) {
+  const ordered = [...rows].sort((a,b) => Number(a.day)-Number(b.day));
+
+  $("weekList").innerHTML = ordered.map(day => {
+    const enabled = Number(day.enabled) === 1;
+    const hours = minutesToTime(day.start_minute) + " – " +
+                  minutesToTime(day.stop_minute);
+
+    return `
+      <div class="day">
+        <span class="day-name">${DAYS[Number(day.day)] || "—"}</span>
+        <span class="hours">${enabled ? hours : "—"}</span>
+        <span class="day-state ${enabled ? "" : "disabled"}">
+          ${enabled ? "ACTIU" : "INACTIU"}
+        </span>
+      </div>`;
+  }).join("");
+}
+
+async function loadState() {
+  $("refreshText").textContent = "Actualitzant dades...";
+  try {
+    const data = await api("/api/state");
+    renderState(data.state);
+    renderSchedule(data.schedule || []);
+    $("userName").textContent = data.username || "Usuari";
+    $("dashboardMessage").textContent =
+      "Dades consultades correctament.";
+    $("refreshText").textContent =
+      "Darrera consulta: " + new Date().toLocaleTimeString("ca-ES");
+  } catch (error) {
+    if (error.message.includes("Sessió")) {
+      sessionStorage.removeItem("caldera_token");
+      stopRefresh();
+      showLogin("La sessió ha caducat. Torna a iniciar-la.");
+      return;
+    }
+    $("dashboardMessage").textContent =
+      "No s'han pogut actualitzar les dades: " + error.message;
+    $("refreshText").textContent = "No s'ha pogut actualitzar";
+  }
+}
+
+function startRefresh() {
+  stopRefresh();
+  loadState();
+  refreshTimer = setInterval(loadState, 30000);
+}
+
+function stopRefresh() {
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = null;
+}
+
+$("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  const button = $("loginButton");
+  button.disabled = true;
+  $("message").textContent = "Validant credencials...";
+
+  try {
+    const response = await fetch(API + "/api/login", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        username:$("username").value.trim(),
+        password:$("password").value
+      })
+    });
+    const data = await response.json();
+    if (!response.ok || !data.ok) {
+      throw new Error(data.error || "Credencials incorrectes");
     }
 
-    function timeToMin(str, isStop) {
-      const [hh, mm] = str.split(":").map(Number);
-      const val = hh * 60 + mm;
-      return (isStop && val === 0) ? 1440 : val;
-    }
+    sessionStorage.setItem("caldera_token", data.token);
+    $("password").value = "";
 
-    function renderWeek() {
-      const container = document.getElementById("week-list");
-      container.innerHTML = schedule.map((d, i) => `
-        <div class="day-row">
-          <label><input type="checkbox" ${d.en ? "checked" : ""} onchange="schedule[${i}].en=this.checked"> ${DAYS[i]}</label>
-          <div>
-            <input type="time" value="${minToTime(d.s)}" onchange="schedule[${i}].s=timeToMin(this.value, false)">
-            –
-            <input type="time" value="${minToTime(d.e)}" onchange="schedule[${i}].e=timeToMin(this.value, true)">
-          </div>
-        </div>
-      `).join("");
-    }
+    await api("/api/me");
+    showDashboard();
+    startRefresh();
+  } catch (error) {
+    $("message").textContent = error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
 
-    function sendMode(mode) {
-      tg.sendData(JSON.stringify({ cmd: "SET_MODE", mode }));
-    }
+$("refreshButton").addEventListener("click", loadState);
 
-    function sendCmd(cmd) {
-      tg.sendData(JSON.stringify({ cmd }));
+$("logoutButton").addEventListener("click", async () => {
+  const currentToken = token();
+  stopRefresh();
+  try {
+    if (currentToken) {
+      await fetch(API + "/api/logout", {
+        method:"POST",
+        headers:{"Authorization":"Bearer " + currentToken}
+      });
     }
+  } catch {}
+  sessionStorage.removeItem("caldera_token");
+  showLogin("Sessió tancada correctament.");
+});
 
-    function saveWeek() {
-      localStorage.setItem("caldera_week", JSON.stringify(schedule));
-      tg.sendData(JSON.stringify({ cmd: "SAVE_WEEK", days: schedule }));
-    }
+async function init() {
+  if (!token()) return;
+  try {
+    const data = await api("/api/me");
+    $("userName").textContent = data.username;
+    showDashboard();
+    startRefresh();
+  } catch {
+    sessionStorage.removeItem("caldera_token");
+    showLogin("La sessió anterior no és vàlida. Inicia sessió.");
+  }
+}
 
-    renderWeek();
-  </script>
+init();
+</script>
 </body>
 </html>
