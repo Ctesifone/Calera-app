@@ -313,10 +313,24 @@ function modeName(value) {
   return names[value] || value || "Desconegut";
 }
 
+function modeDescriptionText(value) {
+  const descriptions = {
+    MANUAL: "La calefacció es governa amb l'interruptor de la caldera.",
+    PROGRAMAT: "Segueix els horaris setmanals configurats.",
+    SCHEDULE: "Segueix els horaris setmanals configurats.",
+    ESTIU: "Manté seleccionat el funcionament en mode d'estiu, independentment dels horaris.",
+    SUMMER: "Manté seleccionat el funcionament en mode d'estiu, independentment dels horaris.",
+    "ESTIU REMOT": "Manté seleccionat el funcionament en mode d'estiu, independentment dels horaris.",
+    HIVERN: "Manté seleccionat el funcionament en mode d'hivern, independentment dels horaris.",
+    WINTER: "Manté seleccionat el funcionament en mode d'hivern, independentment dels horaris.",
+    "HIVERN REMOT": "Manté seleccionat el funcionament en mode d'hivern, independentment dels horaris."
+  };
+  return descriptions[value] || "Funcionament del mode seleccionat.";
+}
+
 function renderState(state) {
   const online = Number(state.device_online) === 1 ||
                  state.device_online === true;
-
   $("connectionDot").className =
     "dot " + (online ? "online" : "offline");
   $("connectionText").textContent =
@@ -327,7 +341,7 @@ function renderState(state) {
 
   $("mode").textContent = modeName(state.control_mode);
   $("modeDescription").textContent =
-    "Mode informat per la base de dades";
+    modeDescriptionText(state.control_mode);
 
   const until = Number(state.stop_override_until || 0);
   if (until > Math.floor(Date.now()/1000)) {
@@ -339,12 +353,10 @@ function renderState(state) {
 
 function renderSchedule(rows) {
   const ordered = [...rows].sort((a,b) => Number(a.day)-Number(b.day));
-
   $("weekList").innerHTML = ordered.map(day => {
     const enabled = Number(day.enabled) === 1;
     const hours = minutesToTime(day.start_minute) + " – " +
                   minutesToTime(day.stop_minute);
-
     return `
       <div class="day">
         <span class="day-name">${DAYS[Number(day.day)] || "—"}</span>
@@ -396,7 +408,6 @@ $("loginForm").addEventListener("submit", async event => {
   const button = $("loginButton");
   button.disabled = true;
   $("message").textContent = "Validant credencials...";
-
   try {
     const response = await fetch(API + "/api/login", {
       method:"POST",
@@ -413,7 +424,6 @@ $("loginForm").addEventListener("submit", async event => {
 
     sessionStorage.setItem("caldera_token", data.token);
     $("password").value = "";
-
     await api("/api/me");
     showDashboard();
     startRefresh();
