@@ -10,9 +10,23 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#f4f6f8",
-  "theme_color": "#263b50",
+  "theme_color": "#57358f",
   "categories": [
     "utilities",
     "house"
+  ],
+  "icons": [
+    {
+      "src": "/Calera-app/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Calera-app/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }
