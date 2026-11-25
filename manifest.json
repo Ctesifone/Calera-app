@@ -1,0 +1,18 @@
+
+{
+  "id": "/Calera-app/",
+  "name": "Caldera De Dietrich 126 Eco NOx",
+  "short_name": "Caldera",
+  "description": "Control remot de la calefacció de la Casa Planell de Manresa",
+  "lang": "ca",
+  "start_url": "/Calera-app/",
+  "scope": "/Calera-app/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f6f8",
+  "theme_color": "#263b50",
+  "categories": [
+    "utilities",
+    "house"
+  ]
+}
